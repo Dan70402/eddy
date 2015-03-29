@@ -11,5 +11,4 @@ def _getLogger():
     _logger.setLevel(logging.INFO)
     logger = _logger
 
-
 _getLogger()

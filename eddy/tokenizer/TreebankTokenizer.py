@@ -1,45 +1,10 @@
-# Natural Language Toolkit: Tokenizers
-#
-# Copyright (C) 2001-2015 NLTK Project
-# Author: Edward Loper <edloper@gmail.com>
-#         Michael Heilman <mheilman@cmu.edu> (re-port from http://www.cis.upenn.edu/~treebank/tokenizer.sed)
-#
-# URL: <http://nltk.sourceforge.net>
-# For license information, see LICENSE.TXT
-
-r"""
-
-Penn Treebank Tokenizer
-
-The Treebank tokenizer uses regular expressions to tokenize text as in Penn Treebank.
-This implementation is a port of the tokenizer sed script written by Robert McIntyre
-and available at http://www.cis.upenn.edu/~treebank/tokenizer.sed.
-"""
-
 import re
 from nltk.tokenize.api import TokenizerI
 
 
 class TreebankTokenizer(TokenizerI):
     """
-    The Treebank tokenizer uses regular expressions to tokenize text as in Penn Treebank.
-    This is the method that is invoked by ``word_tokenize()``.  It assumes that the
-    text has already been segmented into sentences, e.g. using ``sent_tokenize()``.
-
-    This tokenizer performs the following steps:
-
-    - split standard contractions, e.g. ``don't`` -> ``do n't`` and ``they'll`` -> ``they 'll``
-    - treat most punctuation characters as separate tokens
-    - split off commas and single quotes, when followed by whitespace
-    - separate periods that appear at the end of line
-
-        >>> from nltk.tokenize import TreebankWordTokenizer
-        >>> s = '''Good muffins cost $3.88\\nin New York.  Please buy me\\ntwo of them.\\nThanks.'''
-        >>> TreebankWordTokenizer().tokenize(s)
-        ['Good', 'muffins', 'cost', '$', '3.88', 'in', 'New', 'York.', 'Please', 'buy', 'me', 'two', 'of', 'them.', 'Thanks', '.']
-        >>> s = "They'll save and invest more."
-        >>> TreebankWordTokenizer().tokenize(s)
-        ['They', "'ll", 'save', 'and', 'invest', 'more', '.']
+    Slightly modified TreebankTokenizer from nltk
     """
 
     # List of contractions adapted from Robert MacIntyre's tokenizer.
@@ -97,4 +62,3 @@ class TreebankTokenizer(TokenizerI):
         #     text = regexp.sub(r' \1 \2 \3 ', text)
 
         return text.split()
-

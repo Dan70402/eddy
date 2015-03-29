@@ -5,11 +5,18 @@ from eddy.util import Wrapper
 
 
 class SequentialTagger(Wrapper.Wrapper):
+
     def __init__(self, corpus=nltk.corpus.nps_chat):
         tagger = self._loadTagger(corpus)
         super(SequentialTagger,self).__init__(obj=tagger)
 
     def _loadTagger(self, corpus):
+        """
+        Helper to build our customer core Tagger
+
+        :param corpus:
+        :return:
+        """
         pickle_file = os.path.dirname(os.path.realpath(__file__)) + '/' + self.__class__.__name__ + '.p'
         if os.path.isfile(pickle_file):
             with open(pickle_file, 'rb') as f:

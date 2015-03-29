@@ -3,6 +3,7 @@ from eddy import logger
 from eddy.grammar import Grammar
 
 class ActionEvent():
+
     def __init__(self, parser):
         self._parser = parser
 
@@ -111,6 +112,13 @@ N -> 'NN'
 
 
     def _mapBack(self, leaves, lookup_dict):
+        """
+        Used to map back a POS tag to the value it represents
+
+        :param leaves:
+        :param lookup_dict:
+        :return:
+        """
         index_counter = {}
         result = {}
         for tag in lookup_dict.keys():
@@ -124,6 +132,10 @@ N -> 'NN'
         return result
 
     def _getResult(self):
+        """
+        Helper to build the results
+        :return:
+        """
         data = {
             "type" : self._action_type,
             "target" : self._action_target,
@@ -135,6 +147,12 @@ N -> 'NN'
         return self._result
 
     def _clearState(self):
+        """
+        Clear the result state of this object.  You shouldn't instantiate
+        this class everytime you need to parse a string... just call the
+        classes findAction()
+        :return:
+        """
         self._action_type = None
         self._action_target = None
         self._action_verb = None
@@ -143,6 +161,10 @@ N -> 'NN'
         self._result.result = False
 
 class EventResponse():
+    """
+    Response object for an Event
+    #@TODO This will be base generic class
+    """
     def __init__(self, event, data=None, result=False):
         self.event = event
         if data:

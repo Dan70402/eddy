@@ -27,11 +27,15 @@ class Parser():
         return (trees, lookup_dict)
 
     def _canProcessTags(self, grammar, pos_tags):
+        """
+        Helper to check that the generate pos_tags can be
+        processed by the associated grammar
+        """
         badTags = []
         for tag in pos_tags:
             if tag not in grammar.tags:
                 badTags.append(tag)
-                self.logger.debug("Grammar can't handle tag:" + tag)
+                logger.debug("Grammar can't handle tag:" + tag)
         if badTags:
             return False
         else:
