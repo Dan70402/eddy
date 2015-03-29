@@ -27,7 +27,7 @@ class SequentialTagger(Wrapper.Wrapper):
             ]
             t3 = nltk.RegexpTagger(regexps=regexps, backoff=t2)
 
-            # with open(pickle_file, 'wb') as f:
-            #     pickle.dump(t3, f)
+            with open(pickle_file, 'wb') as f:
+                pickle.dump(t3, f)
 
         return t3
