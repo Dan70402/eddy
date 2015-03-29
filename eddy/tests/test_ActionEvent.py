@@ -1,13 +1,13 @@
 import unittest
 from eddy.parser import Parser
-from eddy.module.invite.InviteEvent import InviteEvent
+from eddy.module.action.ActionEvent import ActionEvent
 
 
-class test_InstanceDTO(unittest.TestCase):
+class test_ActionEvent(unittest.TestCase):
 
     def setUp(self):
         self.parser = Parser.Parser()
-        self.invite_event = InviteEvent(self.parser)
+        self.action_event = ActionEvent(self.parser)
 
     def test_RootSNP(self):
         #['test_sent
@@ -35,16 +35,16 @@ class test_InstanceDTO(unittest.TestCase):
         ]
     
         for sentence, correct in SNP_case:
-            _result, _named, _email, _target, _type, _verb = correct
+            _result, _named, _to, _target, _type, _verb = correct
             correct_dict = {
-                "email" : _email ,
-                "target" : _target,
                 "type" : _type,
+                "target" : _target,
                 "verb" : _verb,
+                "to" : _to,
                 "named" : _named
             }
 
-            result = self.invite_event.findInvite(sentence)
+            result = self.action_event.findInvite(sentence)
             self.assertDictEqual(result.data, correct_dict)
             self.assertEqual(result.result, _result)
     
@@ -74,16 +74,16 @@ class test_InstanceDTO(unittest.TestCase):
         ]
     
         for sentence, correct in NP_case:
-            _result, _named, _email, _target, _type, _verb = correct
+            _result, _named, _to, _target, _type, _verb = correct
             correct_dict = {
-                "email" : _email ,
-                "target" : _target,
                 "type" : _type,
+                "target" : _target,
                 "verb" : _verb,
-                "named" : _named 
+                "to" : _to,
+                "named" : _named
             }
-    
-            result = self.invite_event.findInvite(sentence)
+
+            result = self.action_event.findInvite(sentence)
             self.assertDictEqual(result.data, correct_dict)
             self.assertEqual(result.result, _result)
 
@@ -103,20 +103,22 @@ class test_InstanceDTO(unittest.TestCase):
         ]
 
         for sentence, correct in Noun_case:
-            print(sentence)
-            _result, _named, _email, _target, _type, _verb = correct
+            _result, _named, _to, _target, _type, _verb = correct
             correct_dict = {
-                "email" : _email ,
-                "target" : _target,
                 "type" : _type,
+                "target" : _target,
                 "verb" : _verb,
+                "to" : _to,
                 "named" : _named
             }
 
-            result = self.invite_event.findInvite(sentence)
+            result = self.action_event.findInvite(sentence)
             self.assertDictEqual(result.data, correct_dict)
             self.assertEqual(result.result, _result)
 
+            result = self.action_event.findInvite(sentence)
+            self.assertDictEqual(result.data, correct_dict)
+            self.assertEqual(result.result, _result)
 
 
 if __name__ == '__main__':

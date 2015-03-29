@@ -1,24 +1,31 @@
 import nltk
 from eddy import logger
 
-class InviteEvent():
+class ActionEvent():
     def __init__(self, parser):
         self._parser = parser
 
-        self._invite_type = None
-        self._invite_target = None
-        self._invite_verb = None
-        self._invite_email = None
+        self._action_type = None
+        self._action_target = None
+        self._action_verb = None
+        self._to = None
         self._named_noun = None
 
         self._result = EventResponse(self.__class__.__name__)
 
+        #@TODO parse directly from grammar?
+        self._tokens = [
+            'S/NP', 'NP', 'VP', 'EML', 'PP', 'NNP',
+            'N', 'V', 'DT', 'TO', 'IN', 'VB', 'P'
+        ]
+
 #S -> N | N 'EML' | N 'EML' PP | N 'EML' PP PP
         self._grammar = nltk.CFG.fromstring("""
-S -> S/NP | S/NP 'EML' | S/NP 'EML' PP | S/NP 'EML' PP PP
-S -> NP VP | NP VP 'EML' | NP VP 'EML' PP | NP VP 'EML' PP PP
+S -> S/NP | S/NP NNP | S/NP NNP PP | S/NP NNP PP PP
+S -> NP VP | NP VP NNP | NP VP NNP PP | NP VP NNP PP PP
 S/NP -> VP
 NP -> N | Det N
+NNP -> 'EML' | 'USR'
 VP -> V | V NP | V PP | V NP PP | V PP NP
 Det -> 'DT'
 PP -> P NP
@@ -47,9 +54,9 @@ N -> 'NN'
                                     self._named_noun = map['NN'].pop(0)
 
                         if subtree.label() == 'VP' or subtree.label() == 'V':
-                            if not self._invite_verb:
+                            if not self._action_verb:
                                 if map.has_key('VB'):
-                                    self._invite_verb = map['VB'].pop(0)
+                                    self._action_verb = map['VB'].pop(0)
 
                             if subtree.label() == 'VP':
                                 for child in subtree:
@@ -57,18 +64,18 @@ N -> 'NN'
                                     #VP can tree to VP->V VP->V NP
                                     if type(child) is nltk.Tree:
                                         if child.label() == 'NP':
-                                            if not self._invite_type:
-                                                self._invite_type = map['NN'].pop(0)
+                                            if not self._action_type:
+                                                self._action_type = map['NN'].pop(0)
                                         if child.label() == 'PP':
                                             leaf = child.leaves().pop(0)
                                             if leaf == 'TO':
                                                 #'TO' preposition indicates destination
-                                                if not self._invite_target:
-                                                    self._invite_target = map['NN'].pop(0)
+                                                if not self._action_target:
+                                                    self._action_target = map['NN'].pop(0)
                                             if leaf == 'IN':
                                                 #'IN' preposition indicates the type
-                                                if not self._invite_type:
-                                                    self._invite_type = map['NN'].pop(0)
+                                                if not self._action_type:
+                                                    self._action_type = map['NN'].pop(0)
 
                         if subtree.label() == 'S/NP':
                             #get the first VB first NN and first EML
@@ -76,34 +83,34 @@ N -> 'NN'
                             for child in tree[0][0]:
                                 #S/NP can tree to VP->NP PP, VP->PP
                                 if child.label() == 'NP':
-                                    if not self._invite_type:
-                                        self._invite_type = map['NN'].pop(0)
+                                    if not self._action_type:
+                                        self._action_type = map['NN'].pop(0)
                                 if child.label() == 'PP':
-                                    if not self._invite_target:
-                                        self._invite_target = map['NN'].pop(0)
+                                    if not self._action_target:
+                                        self._action_target = map['NN'].pop(0)
 
                             if map.has_key('VB'):
-                                self._invite_verb = map['VB'].pop(0)
+                                self._action_verb = map['VB'].pop(0)
 
                         if subtree.label() == 'PP':
                             leaf = subtree[0].leaves().pop()
                             if leaf == 'TO':
                                 #'TO' preposition indicates destination
-                                if not self._invite_target:
-                                    self._invite_target = map['NN'].pop(0)
+                                if not self._action_target:
+                                    self._action_target = map['NN'].pop(0)
                             if leaf == 'IN':
                                 #'IN' preposition indicates the type
-                                if not self._invite_type:
-                                    self._invite_type = map['NN'].pop(0)
+                                if not self._action_type:
+                                    self._action_type = map['NN'].pop(0)
 
-                    else:
-                        if subtree == 'EML':
-                            if not self._invite_email:
-                                if map.has_key('EML'):
-                                    self._invite_email = map['EML'].pop(0)
+                        if subtree.label() == 'NNP':
+                            if not self._to:
+                                leaf = subtree[0]
+                                if map.has_key(leaf):
+                                    #@TODO add POS to return (useful for distinguishing USR\EML
+                                    self._to = map[leaf].pop(0)
 
-
-                logger.info('action_type:'+str(self._invite_type)+' verb:'+str(self._invite_verb)+' email:'+str(self._invite_email)+' action_target:'+str(self._invite_target))
+                logger.debug('action_type:'+str(self._action_type)+' verb:'+str(self._action_verb)+' to:'+str(self._to)+' action_target:'+str(self._action_target))
                 self._result.result = True
 
         return self._getResult()
@@ -117,7 +124,6 @@ N -> 'NN'
             result[tag] = []
 
         for l in leaves:
-            #print "looking up " + str(l)
             result[l].append(lookup_dict[l][index_counter[l]])
             index_counter[l] += 1
 
@@ -125,20 +131,20 @@ N -> 'NN'
 
     def _getResult(self):
         data = {
-            "type" : self._invite_type,
-            "target" : self._invite_target,
-            "verb" : self._invite_verb,
-            "email" : self._invite_email,
+            "type" : self._action_type,
+            "target" : self._action_target,
+            "verb" : self._action_verb,
+            "to" : self._to,
             "named" : self._named_noun
         }
         self._result.data = data
         return self._result
 
     def _clearState(self):
-        self._invite_type = None
-        self._invite_target = None
-        self._invite_verb = None
-        self._invite_email = None
+        self._action_type = None
+        self._action_target = None
+        self._action_verb = None
+        self._to = None
         self._named_noun = None
         self._result.result = False
 
