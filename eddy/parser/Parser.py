@@ -16,14 +16,27 @@ class Parser():
 
         pos_tags = self._genPosTags(tagged)
         lookup_dict = self._genLookupDict(tagged)
-
-        rd_parser = nltk.RecursiveDescentParser(grammar, trace=0) #trace=2
-
         trees = []
-        for tree in rd_parser.parse(pos_tags):
-            trees.append(tree)
+        if self._canProcessTags(grammar, pos_tags):
+            rd_parser = nltk.RecursiveDescentParser(grammar.grammar, trace=0) #trace=2
+
+            trees = []
+            for tree in rd_parser.parse(pos_tags):
+                trees.append(tree)
 
         return (trees, lookup_dict)
+
+    def _canProcessTags(self, grammar, pos_tags):
+        badTags = []
+        for tag in pos_tags:
+            if tag not in grammar.tags:
+                badTags.append(tag)
+                self.logger.debug("Grammar can't handle tag:" + tag)
+        if badTags:
+            return False
+        else:
+            return True
+
 
     def _genPosTags(self, tagged):
         """

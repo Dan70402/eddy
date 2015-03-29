@@ -1,5 +1,6 @@
 import nltk
 from eddy import logger
+from eddy.grammar import Grammar
 
 class ActionEvent():
     def __init__(self, parser):
@@ -13,14 +14,7 @@ class ActionEvent():
 
         self._result = EventResponse(self.__class__.__name__)
 
-        #@TODO parse directly from grammar?
-        self._tokens = [
-            'S/NP', 'NP', 'VP', 'EML', 'PP', 'NNP',
-            'N', 'V', 'DT', 'TO', 'IN', 'VB', 'P'
-        ]
-
-#S -> N | N 'EML' | N 'EML' PP | N 'EML' PP PP
-        self._grammar = nltk.CFG.fromstring("""
+        self._grammar = Grammar.Grammar("""
 S -> S/NP | S/NP NNP | S/NP NNP PP | S/NP NNP PP PP
 S -> NP VP | NP VP NNP | NP VP NNP PP | NP VP NNP PP PP
 S/NP -> VP
@@ -34,7 +28,7 @@ V -> 'VB'
 N -> 'NN'
 """)
 
-    def findInvite(self, sentence):
+    def findAction(self, sentence):
         logger.debug("Processing: '" + sentence + "'")
         self._clearState()
         trees, lookup_dict = self._parser.parse(self._grammar, sentence)
@@ -110,7 +104,7 @@ N -> 'NN'
                                     #@TODO add POS to return (useful for distinguishing USR\EML
                                     self._to = map[leaf].pop(0)
 
-                logger.debug('action_type:'+str(self._action_type)+' verb:'+str(self._action_verb)+' to:'+str(self._to)+' action_target:'+str(self._action_target))
+                logger.info('action_type:'+str(self._action_type)+' verb:'+str(self._action_verb)+' to:'+str(self._to)+' action_target:'+str(self._action_target))
                 self._result.result = True
 
         return self._getResult()

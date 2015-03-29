@@ -44,7 +44,7 @@ class test_ActionEvent(unittest.TestCase):
                 "named" : _named
             }
 
-            result = self.action_event.findInvite(sentence)
+            result = self.action_event.findAction(sentence)
             self.assertDictEqual(result.data, correct_dict)
             self.assertEqual(result.result, _result)
     
@@ -83,7 +83,7 @@ class test_ActionEvent(unittest.TestCase):
                 "named" : _named
             }
 
-            result = self.action_event.findInvite(sentence)
+            result = self.action_event.findAction(sentence)
             self.assertDictEqual(result.data, correct_dict)
             self.assertEqual(result.result, _result)
 
@@ -112,11 +112,11 @@ class test_ActionEvent(unittest.TestCase):
                 "named" : _named
             }
 
-            result = self.action_event.findInvite(sentence)
+            result = self.action_event.findAction(sentence)
             self.assertDictEqual(result.data, correct_dict)
             self.assertEqual(result.result, _result)
 
-            result = self.action_event.findInvite(sentence)
+            result = self.action_event.findAction(sentence)
             self.assertDictEqual(result.data, correct_dict)
             self.assertEqual(result.result, _result)
 
