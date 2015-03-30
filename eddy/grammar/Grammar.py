@@ -26,7 +26,7 @@ class Grammar():
         :param str:
         :return:
         """
-        reg = re.compile("^'[a-zA-Z]+'")
+        reg = re.compile("^'[a-zA-Z$]+'")
         tags = []
         for t in str.split():
             if reg.match(t):

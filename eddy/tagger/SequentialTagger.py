@@ -20,7 +20,7 @@ class SequentialTagger(Wrapper.Wrapper):
         pickle_file = os.path.dirname(os.path.realpath(__file__)) + '/' + self.__class__.__name__ + '.p'
         if os.path.isfile(pickle_file):
             with open(pickle_file, 'rb') as f:
-                t3 = pickle.load(f)
+                tagger = pickle.load(f)
         else:
             tagged_posts = corpus.tagged_posts()
             t0 = nltk.DefaultTagger('NN')
@@ -32,9 +32,9 @@ class SequentialTagger(Wrapper.Wrapper):
                 (r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)",'EML'), #Emails
                 (r"(^@[a-zA-Z0-9_]+$)",'USR'), #Mentions (Users)
             ]
-            t3 = nltk.RegexpTagger(regexps=regexps, backoff=t2)
+            tagger = nltk.RegexpTagger(regexps=regexps, backoff=t2)
 
             with open(pickle_file, 'wb') as f:
-                pickle.dump(t3, f)
+                pickle.dump(tagger, f)
 
-        return t3
+        return tagger

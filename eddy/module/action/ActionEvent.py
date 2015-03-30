@@ -1,8 +1,10 @@
 import nltk
 from eddy import logger
 from eddy.grammar import Grammar
+from eddy.module.AbstractEvent import AbstractEvent
+from eddy.module.EventReponse import EventResponse
 
-class ActionEvent():
+class ActionEvent(AbstractEvent):
 
     def __init__(self, parser):
         self._parser = parser
@@ -29,7 +31,7 @@ V -> 'VB'
 N -> 'NN'
 """)
 
-    def findAction(self, sentence):
+    def find(self, sentence):
         logger.debug("Processing: '" + sentence + "'")
         self._clearState()
         trees, lookup_dict = self._parser.parse(self._grammar, sentence)
@@ -111,25 +113,7 @@ N -> 'NN'
         return self._getResult()
 
 
-    def _mapBack(self, leaves, lookup_dict):
-        """
-        Used to map back a POS tag to the value it represents
 
-        :param leaves:
-        :param lookup_dict:
-        :return:
-        """
-        index_counter = {}
-        result = {}
-        for tag in lookup_dict.keys():
-            index_counter[tag] = 0
-            result[tag] = []
-
-        for l in leaves:
-            result[l].append(lookup_dict[l][index_counter[l]])
-            index_counter[l] += 1
-
-        return result
 
     def _getResult(self):
         """
@@ -150,7 +134,7 @@ N -> 'NN'
         """
         Clear the result state of this object.  You shouldn't instantiate
         this class everytime you need to parse a string... just call the
-        classes findAction()
+        classes find()
         :return:
         """
         self._action_type = None
@@ -159,16 +143,3 @@ N -> 'NN'
         self._to = None
         self._named_noun = None
         self._result.result = False
-
-class EventResponse():
-    """
-    Response object for an Event
-    #@TODO This will be base generic class
-    """
-    def __init__(self, event, data=None, result=False):
-        self.event = event
-        if data:
-            self.data = data
-        else:
-            self.data = {}
-        self.result = result
